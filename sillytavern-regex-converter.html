@@ -978,6 +978,79 @@ ${rulesHtml}
       fileInput.value = '';
     }
     
+    // 默认规则模板
+    function createDefaultRule(ruleName, htmlContent) {
+      return {
+        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2),
+        scriptName: ruleName,
+        findRegex: "{{regex}}",
+        replaceString: htmlContent,
+        trimStrings: [],
+        placement: [1],
+        disabled: false,
+        markdownOnly: false,
+        promptOnly: false,
+        runOnEdit: true,
+        substituteRegex: false,
+        minDepth: 0,
+        maxDepth: 100
+      };
+    }
+    
+    // 从任意 HTML 提取内容（无标记时使用整个 body 或全部内容）
+    function parseRawHtml(html) {
+      const result = new Map();
+      
+      // 先尝试提取带标记的规则
+      const rulePattern = /<!--\s*REGEX_RULE:\s*(.+?)\s*-->([\s\S]*?)<!--\s*END_RULE:\s*\1\s*-->/g;
+      let match;
+      let hasMarkers = false;
+      
+      while ((match = rulePattern.exec(html)) !== null) {
+        hasMarkers = true;
+        const ruleName = match[1].trim();
+        let content = match[2];
+        const divMatch = content.match(/<div[^>]*class="rule"[^>]*>([\s\S]*?)<\/div>/);
+        if (divMatch) content = divMatch[1];
+        content = content.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
+        result.set(ruleName, content);
+      }
+      
+      // 如果没有标记，提取整个内容作为单个规则
+      if (!hasMarkers) {
+        let content = html;
+        // 尝试提取 body 内容
+        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        if (bodyMatch) {
+          content = bodyMatch[1];
+        }
+        // 清理首尾空白
+        content = content.trim();
+        if (content) {
+          result.set('HTML Content', content);
+        }
+      }
+      
+      return result;
+    }
+    
+    // 从 HTML 创建新的 JSON（使用默认模板）
+    function createJsonFromHtml(contents) {
+      const rules = [];
+      for (const [name, content] of contents) {
+        rules.push(createDefaultRule(name, content));
+      }
+      
+      if (rules.length === 1) {
+        return rules[0]; // 单规则直接返回
+      }
+      
+      return {
+        scriptName: 'Converted Script',
+        data: rules
+      };
+    }
+    
     function handleConvert() {
       const input = inputArea.value.trim();
       if (!input) {
@@ -996,18 +1069,29 @@ ${rulesHtml}
           const formatNote = normalized._isSingleRule ? '（单规则）' : '';
           showStatus(`✓ 转换成功！共 ${ruleCount} 条规则 ${formatNote}`, 'success');
         } else {
-          if (!originalScript) {
-            showStatus('⚠ 请先进行 JSON → HTML 转换', 'error');
-            return;
-          }
-          const newContents = parseMarkedHtml(input);
+          // HTML → JSON 转换
+          const newContents = parseRawHtml(input);
+          
           if (newContents.size === 0) {
-            showStatus('⚠ 未找到有效的规则标记', 'error');
+            showStatus('⚠ 未找到有效内容', 'error');
             return;
           }
-          const rebuilt = rebuildRegexScript(originalScript, newContents);
-          outputArea.value = JSON.stringify(rebuilt, null, 2);
-          showStatus(`✓ 转换成功！已更新 ${newContents.size} 条规则`, 'success');
+          
+          let result;
+          let statusNote = '';
+          
+          if (originalScript) {
+            // 有原始脚本，更新内容
+            result = rebuildRegexScript(originalScript, newContents);
+            statusNote = '已更新';
+          } else {
+            // 无原始脚本，使用默认模板创建新 JSON
+            result = createJsonFromHtml(newContents);
+            statusNote = '已创建（使用默认模板）';
+          }
+          
+          outputArea.value = JSON.stringify(result, null, 2);
+          showStatus(`✓ 转换成功！${statusNote} ${newContents.size} 条规则`, 'success');
         }
       } catch (error) {
         showStatus(`✗ ${error.message}`, 'error');
