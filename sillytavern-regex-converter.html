@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SillyTavern 正则转换器</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* CSS Variables */
+    :root {
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-dark: #4f46e5;
+      --accent: #06b6d4;
+      --accent-light: #22d3ee;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --bg-dark: #0f0f23;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --bg-glass: rgba(255, 255, 255, 0.05);
+      --border-glass: rgba(255, 255, 255, 0.1);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+    }
+
+    /* Animated Background */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
+      background: var(--bg-dark);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse 80% 50% at 20% -20%, rgba(99, 102, 241, 0.25), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(6, 182, 212, 0.2), transparent),
+        radial-gradient(ellipse 50% 30% at 50% 50%, rgba(139, 92, 246, 0.1), transparent);
+      pointer-events: none;
+      z-index: -1;
+      animation: bgPulse 15s ease-in-out infinite;
+    }
+
+    @keyframes bgPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Floating Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: -1;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      top: -100px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      bottom: -50px;
+      left: -50px;
+      animation-delay: -7s;
+    }
+
+    .orb-3 {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, var(--accent), #34d399);
+      top: 50%;
+      left: 50%;
+      animation-delay: -14s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(20px, 30px) scale(1.02); }
+    }
+
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px 0;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-xl);
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-glow);
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    .logo svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    .header .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 15px;
+      padding: 6px 14px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Mode Selector */
+    .mode-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 40px;
+      position: relative;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 6px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      backdrop-filter: blur(20px);
+    }
+
+    .mode-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .mode-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .mode-btn.active {
+      color: var(--text-primary);
+    }
+
+    .mode-icon {
+      font-family: 'Consolas', monospace;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .mode-indicator {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: calc(50% - 10px);
+      height: calc(100% - 12px);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: var(--radius-md);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .mode-indicator.right {
+      transform: translateX(calc(100% + 8px));
+    }
+
+    /* Glass Card */
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 
+        0 8px 40px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-bottom: 30px;
+    }
+
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      min-height: 500px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .panel-icon {
+      font-size: 1.2rem;
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Textarea */
+    .textarea-wrapper {
+      position: relative;
+      flex: 1;
+      display: flex;
+    }
+
+    .textarea {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      padding: 20px;
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      resize: none;
+      transition: all 0.3s ease;
+    }
+
+    .textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .textarea-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      opacity: 0;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      filter: blur(20px);
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .textarea:focus + .textarea-glow {
+      opacity: 0.1;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-glass);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-glass);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Convert Button - Minimal Style */
+    .convert-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+    }
+
+    .btn-convert {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 16px 14px;
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .btn-convert:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--primary);
+      color: var(--text-primary);
+      transform: scale(1.02);
+    }
+
+    .btn-convert:active {
+      transform: scale(0.98);
+    }
+
+    .btn-convert-bg {
+      display: none;
+    }
+
+    .btn-convert svg, .btn-convert span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-convert svg {
+      stroke: var(--primary-light);
+      transition: all 0.3s ease;
+    }
+
+    .btn-convert:hover svg {
+      stroke: var(--accent-light);
+    }
+
+    .convert-arrow {
+      animation: arrowBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes arrowBounce {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(3px); }
+    }
+
+    /* Status Message */
+    .status-container {
+      margin-top: 20px;
+      min-height: 60px;
+    }
+
+    .status-message {
+      display: none;
+      padding: 16px 24px;
+      border-radius: var(--radius-lg);
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-message.show {
+      display: block;
+    }
+
+    .status-message.success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    .status-message.error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    .status-message.info {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--primary-light);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .panels {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .convert-center {
+        padding: 15px 0;
+      }
+
+      .btn-convert {
+        flex-direction: row;
+        padding: 14px 32px;
+        gap: 10px;
+      }
+
+      .convert-arrow {
+        transform: rotate(90deg);
+      }
+
+      .panel {
+        min-height: 350px;
+      }
+
+      .textarea {
+        min-height: 300px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .mode-selector {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .mode-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .mode-indicator {
+        width: calc(100% - 12px);
+        height: calc(50% - 7px);
+        transform: none;
+      }
+
+      .mode-indicator.right {
+        transform: translateY(calc(100% + 4px));
+      }
+
+      .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .panel-actions {
+        width: 100%;
+      }
+
+      .btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .orb { display: none; }
+    }
+</style>
+</head>
+<body>
+  <!-- Floating Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h1>SillyTavern 正则转换器</h1>
+      <p>JSON ↔ HTML 双向转换工具</p>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        纯前端 · 离线可用 · 数据安全
+      </div>
+    </header>
+
+    <!-- Mode Selection -->
+    <div class="mode-selector">
+      <button class="mode-btn active" data-mode="json-to-html">
+        <span class="mode-icon">{ }</span>
+        <span class="mode-label">JSON → HTML</span>
+      </button>
+      <button class="mode-btn" data-mode="html-to-json">
+        <span class="mode-icon">&lt;/&gt;</span>
+        <span class="mode-label">HTML → JSON</span>
+      </button>
+      <div class="mode-indicator"></div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="panels">
+        <!-- Input Panel -->
+        <div class="panel glass-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="panel-icon">📥</span>
+              <span>输入</span>
+            </div>
+            <div class="panel-actions">
+              <label class="btn btn-ghost">
+                <input type="file" id="fileInput" accept=".json,.html,.txt" hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>上传</span>
+              </label>
+              <button class="btn btn-ghost" id="clearInputBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                <span>清空</span>
+              </button>
+            </div>
+          </div>
+          <div class="textarea-wrapper">
+            <textarea id="inputArea" class="textarea" placeholder="在此粘贴内容或上传文件..."></textarea>
+            <div class="textarea-glow"></div>
+          </div>
+        </div>
+
+        <!-- Center Convert Button -->
+        <div class="convert-center">
+          <button class="btn-convert" id="convertBtn">
+            <div class="btn-convert-bg"></div>
+            <svg class="convert-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            <span>转换</span>
+          </button>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="panel glass-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="panel-icon">📤</span>
+              <span>输出</span>
+            </div>
+            <div class="panel-actions">
+              <button class="btn btn-ghost" id="copyBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <span>复制</span>
+              </button>
+              <button class="btn btn-primary" id="downloadBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>下载</span>
+              </button>
+            </div>
+          </div>
+          <div class="textarea-wrapper">
+            <textarea id="outputArea" class="textarea" placeholder="转换结果将显示在这里..." readonly></textarea>
+            <div class="textarea-glow"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Status Message -->
+    <div class="status-container" id="statusArea">
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Made with ❤️ for SillyTavern Community</p>
+    </footer>
+  </div>
+
+  <script>
+    // ============================================
+    // JSON Parser Module
+    // ============================================
+    
+    function parseRegexJson(jsonString) {
+      if (!jsonString || typeof jsonString !== 'string') {
+        throw new Error('请输入有效的 JSON 内容');
+      }
+      const trimmed = jsonString.trim();
+      if (!trimmed) throw new Error('JSON 内容不能为空');
+      try {
+        return JSON.parse(trimmed);
+      } catch (e) {
+        throw new Error(`JSON 解析失败：${e.message}`);
+      }
+    }
+    
+    function isSingleRule(data) {
+      return data && typeof data === 'object' && 
+             typeof data.findRegex === 'string' && 
+             typeof data.replaceString === 'string' &&
+             !Array.isArray(data.data);
+    }
+    
+    function normalizeRegexJson(data) {
+      if (isSingleRule(data)) {
+        return {
+          scriptName: data.scriptName || 'Single Rule',
+          data: [data],
+          _isSingleRule: true
+        };
+      }
+      return data;
+    }
+    
+    function validateRegexJson(data) {
+      if (!data || typeof data !== 'object') {
+        throw new Error('无效的 SillyTavern 正则格式：数据必须是对象');
+      }
+      if (isSingleRule(data)) {
+        if (typeof data.scriptName !== 'string') {
+          throw new Error('无效的 SillyTavern 正则格式：缺少 scriptName 字段');
+        }
+        return true;
+      }
+      if (typeof data.scriptName !== 'string') {
+        throw new Error('无效的 SillyTavern 正则格式：缺少 scriptName 字段');
+      }
+      if (!Array.isArray(data.data)) {
+        throw new Error('无效的 SillyTavern 正则格式：缺少 data 数组');
+      }
+      for (let i = 0; i < data.data.length; i++) {
+        const rule = data.data[i];
+        if (!rule || typeof rule !== 'object') {
+          throw new Error(`规则 ${i + 1} 不是有效对象`);
+        }
+        if (typeof rule.scriptName !== 'string') {
+          throw new Error(`规则 ${i + 1} 缺少 scriptName`);
+        }
+        if (typeof rule.findRegex !== 'string') {
+          throw new Error(`规则 ${i + 1} 缺少 findRegex`);
+        }
+        if (typeof rule.replaceString !== 'string') {
+          throw new Error(`规则 ${i + 1} 缺少 replaceString`);
+        }
+      }
+      return true;
+    }
+
+    // ============================================
+    // HTML Converter Module
+    // ============================================
+    
+    function convertToHtml(script) {
+      const rules = script.data || [];
+      let rulesHtml = '';
+      for (const rule of rules) {
+        const ruleName = rule.scriptName || 'Unnamed Rule';
+        const content = rule.replaceString || '';
+        rulesHtml += `
+  <!-- REGEX_RULE: ${escapeHtml(ruleName)} -->
+  <div class="rule" data-rule-name="${escapeHtml(ruleName)}">
+${content}
+  </div>
+  <!-- END_RULE: ${escapeHtml(ruleName)} -->
+`;
+      }
+      return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SillyTavern Regex - ${escapeHtml(script.scriptName || 'Untitled')}</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+    .rule { margin: 20px 0; padding: 20px; border: 1px solid #333; border-radius: 12px; background: rgba(255,255,255,0.05); }
+    .rule::before { content: attr(data-rule-name); display: block; font-weight: bold; margin-bottom: 15px; color: #818cf8; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1 style="color: #f8fafc;">${escapeHtml(script.scriptName || 'Untitled')}</h1>
+${rulesHtml}
+</body>
+</html>`;
+    }
+    
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+    
+    function parseMarkedHtml(html) {
+      const result = new Map();
+      const rulePattern = /<!--\s*REGEX_RULE:\s*(.+?)\s*-->([\s\S]*?)<!--\s*END_RULE:\s*\1\s*-->/g;
+      let match;
+      while ((match = rulePattern.exec(html)) !== null) {
+        const ruleName = match[1].trim();
+        let content = match[2];
+        const divMatch = content.match(/<div[^>]*class="rule"[^>]*>([\s\S]*?)<\/div>/);
+        if (divMatch) content = divMatch[1];
+        content = content.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
+        result.set(ruleName, content);
+      }
+      return result;
+    }
+    
+    function rebuildRegexScript(original, newContents) {
+      const result = JSON.parse(JSON.stringify(original));
+      for (const rule of result.data) {
+        const ruleName = rule.scriptName;
+        if (newContents.has(ruleName)) {
+          rule.replaceString = newContents.get(ruleName);
+        }
+      }
+      if (result._isSingleRule && result.data.length === 1) {
+        const singleRule = result.data[0];
+        delete result._isSingleRule;
+        return singleRule;
+      }
+      delete result._isSingleRule;
+      return result;
+    }
+
+    // ============================================
+    // File Handler Module
+    // ============================================
+    
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('文件读取失败'));
+        reader.readAsText(file, 'UTF-8');
+      });
+    }
+    
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+    
+    function generateFilename(originalName, extension) {
+      let baseName = originalName || 'sillytavern-regex';
+      baseName = baseName.replace(/\.(json|html|txt)$/i, '').trim() || 'sillytavern-regex';
+      return `${baseName}${extension}`;
+    }
+
+    // ============================================
+    // UI Controller
+    // ============================================
+    
+    let currentMode = 'json-to-html';
+    let originalScript = null;
+    let currentFilename = '';
+    
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const inputArea = document.getElementById('inputArea');
+    const outputArea = document.getElementById('outputArea');
+    const fileInput = document.getElementById('fileInput');
+    const clearInputBtn = document.getElementById('clearInputBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const convertBtn = document.getElementById('convertBtn');
+    const statusMessage = document.getElementById('statusMessage');
+    
+    function showStatus(message, type = 'info') {
+      statusMessage.textContent = message;
+      statusMessage.className = `status-message show ${type}`;
+      if (type !== 'error') {
+        setTimeout(() => statusMessage.classList.remove('show'), 5000);
+      }
+    }
+    
+    function updatePlaceholders() {
+      if (currentMode === 'json-to-html') {
+        inputArea.placeholder = '在此粘贴 SillyTavern 正则 JSON 内容，或上传文件...';
+        outputArea.placeholder = '转换后的 HTML 代码将显示在这里...';
+      } else {
+        inputArea.placeholder = '在此粘贴编辑后的 HTML 内容，或上传文件...';
+        outputArea.placeholder = '转换后的 JSON 将显示在这里...';
+      }
+    }
+    
+    function handleModeChange(e) {
+      const btn = e.target.closest('.mode-btn');
+      if (!btn) return;
+      const mode = btn.dataset.mode;
+      if (mode === currentMode) return;
+      currentMode = mode;
+      modeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update mode indicator position
+      const indicator = document.querySelector('.mode-indicator');
+      if (mode === 'html-to-json') {
+        indicator.classList.add('right');
+      } else {
+        indicator.classList.remove('right');
+      }
+      
+      updatePlaceholders();
+      outputArea.value = '';
+      statusMessage.classList.remove('show');
+    }
+    
+    async function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const content = await readFile(file);
+        inputArea.value = content;
+        currentFilename = file.name;
+        showStatus(`✓ 已加载: ${file.name}`, 'success');
+      } catch (error) {
+        showStatus(error.message, 'error');
+      }
+      fileInput.value = '';
+    }
+    
+    function handleConvert() {
+      const input = inputArea.value.trim();
+      if (!input) {
+        showStatus('⚠ 请输入内容或上传文件', 'error');
+        return;
+      }
+      try {
+        if (currentMode === 'json-to-html') {
+          const parsed = parseRegexJson(input);
+          validateRegexJson(parsed);
+          const normalized = normalizeRegexJson(parsed);
+          originalScript = normalized;
+          const html = convertToHtml(normalized);
+          outputArea.value = html;
+          const ruleCount = normalized.data.length;
+          const formatNote = normalized._isSingleRule ? '（单规则）' : '';
+          showStatus(`✓ 转换成功！共 ${ruleCount} 条规则 ${formatNote}`, 'success');
+        } else {
+          if (!originalScript) {
+            showStatus('⚠ 请先进行 JSON → HTML 转换', 'error');
+            return;
+          }
+          const newContents = parseMarkedHtml(input);
+          if (newContents.size === 0) {
+            showStatus('⚠ 未找到有效的规则标记', 'error');
+            return;
+          }
+          const rebuilt = rebuildRegexScript(originalScript, newContents);
+          outputArea.value = JSON.stringify(rebuilt, null, 2);
+          showStatus(`✓ 转换成功！已更新 ${newContents.size} 条规则`, 'success');
+        }
+      } catch (error) {
+        showStatus(`✗ ${error.message}`, 'error');
+      }
+    }
+    
+    function handleDownload() {
+      const content = outputArea.value.trim();
+      if (!content) {
+        showStatus('⚠ 没有可下载的内容', 'error');
+        return;
+      }
+      try {
+        if (currentMode === 'json-to-html') {
+          const filename = generateFilename(originalScript?.scriptName || currentFilename, '.html');
+          downloadFile(content, filename, 'text/html;charset=utf-8');
+          showStatus(`✓ 已下载: ${filename}`, 'success');
+        } else {
+          const filename = generateFilename(originalScript?.scriptName || currentFilename, '.json');
+          downloadFile(content, filename, 'application/json;charset=utf-8');
+          showStatus(`✓ 已下载: ${filename}`, 'success');
+        }
+      } catch (error) {
+        showStatus('✗ 下载失败', 'error');
+      }
+    }
+    
+    async function handleCopy() {
+      const content = outputArea.value.trim();
+      if (!content) {
+        showStatus('⚠ 没有可复制的内容', 'error');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(content);
+        showStatus('✓ 已复制到剪贴板', 'success');
+      } catch (error) {
+        outputArea.select();
+        document.execCommand('copy');
+        showStatus('✓ 已复制到剪贴板', 'success');
+      }
+    }
+    
+    function handleClearInput() {
+      inputArea.value = '';
+      outputArea.value = '';
+      statusMessage.classList.remove('show');
+    }
+    
+    // Event Listeners
+    modeBtns.forEach(btn => btn.addEventListener('click', handleModeChange));
+    fileInput.addEventListener('change', handleFileUpload);
+    convertBtn.addEventListener('click', handleConvert);
+    downloadBtn.addEventListener('click', handleDownload);
+    copyBtn.addEventListener('click', handleCopy);
+    clearInputBtn.addEventListener('click', handleClearInput);
+    
+    // Initialize
+    updatePlaceholders();
+  </script>
+</body>
+</html>
