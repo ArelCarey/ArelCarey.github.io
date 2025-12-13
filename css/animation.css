@@ -22,26 +22,59 @@
   100% {opacity: 1;top: 0rem;}
 }
 
-/* 炫光文字效果 */
+/* 炫光文字效果 - 优化版 */
 .glow-text {
   animation: glow 2s ease-in-out infinite alternate;
-  text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #2ac3ff, 0 0 40px #2ac3ff, 0 0 50px #2ac3ff, 0 0 60px #2ac3ff;
+  text-shadow: 0 0 10px #fff, 0 0 30px #2ac3ff;
+  will-change: text-shadow;
 }
 
 @keyframes glow {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #2ac3ff, 0 0 40px #2ac3ff, 0 0 50px #2ac3ff, 0 0 60px #2ac3ff;
+    text-shadow: 0 0 10px #fff, 0 0 30px #2ac3ff;
   }
   to {
-    text-shadow: 0 0 20px #fff, 0 0 30px #ff6b9d, 0 0 40px #ff6b9d, 0 0 50px #ff6b9d, 0 0 60px #ff6b9d, 0 0 70px #ff6b9d;
+    text-shadow: 0 0 15px #fff, 0 0 35px #ff6b9d;
   }
 }
 
 @-webkit-keyframes glow {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #2ac3ff, 0 0 40px #2ac3ff, 0 0 50px #2ac3ff, 0 0 60px #2ac3ff;
+    text-shadow: 0 0 10px #fff, 0 0 30px #2ac3ff;
   }
   to {
-    text-shadow: 0 0 20px #fff, 0 0 30px #ff6b9d, 0 0 40px #ff6b9d, 0 0 50px #ff6b9d, 0 0 60px #ff6b9d, 0 0 70px #ff6b9d;
+    text-shadow: 0 0 15px #fff, 0 0 35px #ff6b9d;
   }
+}
+
+/* 签名辉光效果 - 淡粉色 */
+.signature-glow {
+  color: #ffb6c1;
+  text-shadow: 0 0 8px #ffb6c1, 0 0 20px #ff69b4;
+  animation: signature-glow 2.5s ease-in-out infinite alternate;
+  will-change: text-shadow;
+}
+
+@keyframes signature-glow {
+  from {
+    text-shadow: 0 0 8px #ffb6c1, 0 0 20px #ff69b4;
+  }
+  to {
+    text-shadow: 0 0 12px #fff, 0 0 25px #ffb6c1;
+  }
+}
+
+@-webkit-keyframes signature-glow {
+  from {
+    text-shadow: 0 0 8px #ffb6c1, 0 0 20px #ff69b4;
+  }
+  to {
+    text-shadow: 0 0 12px #fff, 0 0 25px #ffb6c1;
+  }
+}
+
+/* 背景图片铺满 */
+#cxo-intro {
+  background-size: cover;
+  background-position: center center;
 }
