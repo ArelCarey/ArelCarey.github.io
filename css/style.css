@@ -1,0 +1,249 @@
+@font-face {
+  font-family: 'ZCOOL KuaiLe';
+  src: url('https://cdn.jsdelivr.net/gh/AiursoftWeb/Fonts@master/ZCOOLKuaiLe/ZCOOLKuaiLe-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'ZCOOL KuaiLe', sans-serif;
+  background: #f5f0e6;
+  color: #4a3c2e;
+  line-height: 1.8;
+}
+
+.container {
+  min-height: 100%;
+}
+
+.diary-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 左侧个人信息 */
+.profile-card {
+  width: 300px;
+  flex-shrink: 0;
+  background: #ebe4d6;
+  border-right: 1px solid #d4c4a8;
+  padding: 60px 40px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.profile-content {
+  text-align: center;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #c9b896;
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.2);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.author-name {
+  font-size: 1.6rem;
+  font-weight: normal;
+  color: #4a3c2e;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #8b7355;
+  font-style: italic;
+  margin-bottom: 25px;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9b896, transparent);
+  margin: 25px 0;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #6b5a4a;
+  line-height: 2;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 1px dashed #c9b896;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  color: #5c4a3a;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #8b7355;
+  margin-top: 5px;
+}
+
+/* 右侧日记区域 */
+.diary-list {
+  flex: 1;
+  padding: 45px 50px;
+  background: #faf6ed;
+}
+
+.diary-card {
+  max-width: 650px;
+  margin-bottom: 35px;
+}
+
+.diary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0d5c0;
+}
+
+.diary-meta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.diary-date {
+  font-size: 0.9rem;
+  color: #8b7355;
+}
+
+.diary-weather,
+.diary-mood {
+  font-size: 1.1rem;
+}
+
+.diary-category {
+  font-size: 0.8rem;
+  padding: 4px 14px;
+  background: #ebe4d6;
+  color: #6b5a4a;
+  border-radius: 3px;
+}
+
+.diary-title {
+  display: none;
+}
+
+.diary-content {
+  color: #5c4a3a;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.diary-content p {
+  margin-bottom: 12px;
+  text-indent: 2em;
+}
+
+.diary-content h2 {
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: #4a3c2e;
+  margin: 30px 0 18px;
+  padding-left: 12px;
+  border-left: 3px solid #c9b896;
+}
+
+.diary-content blockquote {
+  margin: 20px 0;
+  padding: 15px 20px;
+  background: #f0e9db;
+  border-left: 3px solid #c9b896;
+  color: #6b5a4a;
+  font-style: italic;
+}
+
+.diary-content ul,
+.diary-content ol {
+  margin: 18px 0;
+  padding-left: 2.5em;
+}
+
+.diary-content li {
+  margin-bottom: 8px;
+}
+
+.diary-content li::marker {
+  color: #8b7355;
+}
+
+.diary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px dashed #d4c4a8;
+}
+
+.tag {
+  font-size: 0.85rem;
+  padding: 5px 14px;
+  background: #ebe4d6;
+  color: #6b5a4a;
+  border-radius: 3px;
+}
+
+/* 响应式 */
+@media (max-width: 800px) {
+  .diary-wrapper {
+    flex-direction: column;
+  }
+  
+  .profile-card {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 40px 30px;
+  }
+  
+  .stats {
+    gap: 40px;
+  }
+  
+  .diary-list {
+    padding: 40px 25px;
+  }
+}
